@@ -39,7 +39,7 @@ def main():
 
     # cat = pywikibot.Category(site, 'Category:Europe')
     # gen = pagegenerators.CategorizedPageGenerator(cat)
-    gen = pagegenerators.AllpagesPageGenerator(site=site, start="A", namespace=0)
+    gen = pagegenerators.AllpagesPageGenerator(site=site, start="Barst", namespace=0)
     
     nostr_post = NostrPost()
 
@@ -63,7 +63,10 @@ def main():
                     zoom = map_params.group('zoom')
                     print(f"Map parameters: lat={lat}, lng={lng}, zoom={zoom}")
 
-                    nostr_post.post(page, lat, lng, zoom)
+                    if lat and lng and zoom:
+                        nostr_post.post(page, lat, lng, zoom)
+                    else:
+                        print ("Problem parsing latlng")
                 else:
                     print ("Can't extract lat lng")
 
@@ -71,6 +74,8 @@ def main():
             print("The text contains {{IsIn}}")
         elif "{{geo-missing}}" in txt:
             print("The text already contains {{geo-missing}}")
+        elif "#redirect" in txt.lower():
+            print("This is a redirect page")
         else:
             txt = page.text + "\n\n{{geo-missing}}\n"
             page.text = txt
