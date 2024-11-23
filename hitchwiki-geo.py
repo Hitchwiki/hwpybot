@@ -34,29 +34,38 @@ def main():
         site.login()  # This will prompt for a password if not already saved
 
     print("Logged in as:", site.user())    
-    cat = pywikibot.Category(site, 'Category:Europe')
-    gen = pagegenerators.CategorizedPageGenerator(cat)
 
+    # gen = pagegenerators.RecentChangesPageGenerator(site, total=100)
+
+    # cat = pywikibot.Category(site, 'Category:Europe')
+    # gen = pagegenerators.CategorizedPageGenerator(cat)
+    gen = pagegenerators.AllpagesPageGenerator(site=site, start="A", namespace=0)
+    
     nostr_post = NostrPost()
 
     for page in gen:
-        print(page)
+        print (page)
         txt = page.text
         if "<map" in txt:
             print("The text contains a map.")
             import re
             map_lines = [line for line in txt.split('\n') if "<map" in line]
             for line in map_lines:
+                line = re.sub(r'\s+width=["\'][^"\']*["\']', '', line)
+                line = re.sub(r'\s+height=["\'][^"\']*["\']', '', line)
+                line = re.sub(r'\s+view=["\'][^"\']*["\']', '', line)
                 print(f"Line containing <map: {line}")
-                map_params = re.search(r"<map\s+lat=['\"](?P<lat>[^'\"]*)['\"]\s+lng=['\"](?P<lng>[^'\"]*)['\"]\s+zoom=['\"](?P<zoom>[^'\"]*)['\"]\s+view=['\"](?P<view>[^'\"]*)['\"](\s+\w+=[\"'][^\"']*[\"'])*\s*/?>", line)
+                map_params = re.search(r"<map\s+lat=['\"](?P<lat>[^'\"]*)['\"]\s+lng=['\"](?P<lng>[^'\"]*)['\"]\s+zoom=['\"](?P<zoom>[^'\"]*)['\"](\s+\w+=[\"'][^\"']*[\"'])*\s*/?>", line)
+                # map_params = re.search(r"<map\s+lat=['\"](?P<lat>[^'\"]*)['\"]\s+lng=['\"](?P<lng>[^'\"]*)['\"]\s+zoom=['\"](?P<zoom>[^'\"]*)['\"]\s+view=['\"](?P<view>[^'\"]*)['\"](\s+\w+=[\"'][^\"']*[\"'])*\s*/?>", line)
                 if map_params:
                     lat = map_params.group('lat')
                     lng = map_params.group('lng')
                     zoom = map_params.group('zoom')
-                    view = map_params.group('view')
-                    print(f"Map parameters: lat={lat}, lng={lng}, zoom={zoom}, view={view}")
+                    print(f"Map parameters: lat={lat}, lng={lng}, zoom={zoom}")
 
-                    nostr_post.post(page, lat, lng, zoom, view)
+                    nostr_post.post(page, lat, lng, zoom)
+                else:
+                    print ("Can't extract lat lng")
 
         elif "{{IsIn" in txt:
             print("The text contains {{IsIn}}")
@@ -81,7 +90,7 @@ class NostrPost:
         for relay in settings.relays:
             self.relay_manager.add_relay(relay)
 
-    def post(self, page, lat, lng, zoom, view):
+    def post(self, page, lat, lng, zoom):
         print(page)
 
         lat = float(lat)
@@ -111,26 +120,27 @@ class NostrPost:
         geohash = geohash2.encode(lat, lng)
 
         if code_length >= 6:
-            prefixes = ['l', pluscode[:6]+"00+", pluscode[:4]+"0000+", pluscode[:2]+"000000+", "open-location-code-prefix"],
+            prefixes = ['l', pluscode[:6]+"00+", pluscode[:4]+"0000+", pluscode[:2]+"000000+", "open-location-code-prefix"]
         elif code_length >= 4:
-            prefixes = ['l', pluscode[:4]+"0000+", pluscode[:2]+"000000+", "open-location-code-prefix"],
+            prefixes = ['l', pluscode[:4]+"0000+", pluscode[:2]+"000000+", "open-location-code-prefix"]
         else:
-            prefixes = ['l', pluscode[:2]+"000000+", "open-location-code-prefix"],
+            prefixes = ['l', pluscode[:2]+"000000+", "open-location-code-prefix"]
+
+        tags = [
+            ['d', d_tag],
+            ['L', "open-location-code"],
+            ['l', pluscode, "open-location-code"],
+            ['L', "open-location-code-prefix"],
+            prefixes,
+            ['L', "trustroots-circle"],
+            ['l', "hitchhikers", "trustroots-circle"],
+            ['g', geohash],
+            ['t', 'hitchwiki'],
+            ['linkPath', page_path]  ## linkPath isn't defined in any NIP
+        ]
 
         # see also https://github.com/Trustroots/nostroots/blob/main/docs/Events.md
-        event = Event(kind=event_kind, content=event_content, tags=
-                      [
-                       ['d', d_tag],
-                       ['L', "open-location-code"],
-                       ['l', pluscode, "open-location-code"],
-                       ['L', "open-location-code-prefix"],
-                       prefixes,
-                       ['L', "trustroots-circle"],
-                       ['l', "hitchhikers", "trustroots-circle"],
-                       ['g', geohash],
-                       ['t', 'hitchwiki'],
-                       ['linkPath', page_path]  ## linkPath isn't defined in any NIP
-                      ]);
+        event = Event(kind=event_kind, content=event_content, tags=tags);
         
         event.sign(self.private_key_hex)
         
