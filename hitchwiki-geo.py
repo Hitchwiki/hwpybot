@@ -29,20 +29,17 @@ import settings
 
 def main():
     site = pywikibot.Site('en', 'hitchwiki')
-    # print(site.title())
-
-    # Log in
+    
     if not site.user():
         site.login()  # This will prompt for a password if not already saved
 
     print("Logged in as:", site.user())    
-    cat = pywikibot.Category(site, 'Category:Ireland')
+    cat = pywikibot.Category(site, 'Category:Europe')
     gen = pagegenerators.CategorizedPageGenerator(cat)
 
     nostr_post = NostrPost()
 
     for page in gen:
-        # Do something with the page object, for example:
         print(page)
         txt = page.text
         if "<map" in txt:
@@ -89,6 +86,7 @@ class NostrPost:
 
         lat = float(lat)
         lng = float(lng)
+        zoom = int(zoom)
 
         text = page.text
         title = page.title()
@@ -100,8 +98,24 @@ class NostrPost:
         page_url = page.full_url()
         page_path = '/' + '/'.join(page_url.split('/')[3:])
 
-        pluscode = openlocationcode.encode(lat, lng)
+        print("ZOOM level", zoom)
+        # Determine the code length based on zoom level
+        if zoom >= 10:
+            code_length = 8
+        elif zoom >= 8:
+            code_length = 6
+        else:
+            code_length = 4
+
+        pluscode = openlocationcode.encode(lat, lng, code_length)
         geohash = geohash2.encode(lat, lng)
+
+        if code_length >= 6:
+            prefixes = ['l', pluscode[:6]+"00+", pluscode[:4]+"0000+", pluscode[:2]+"000000+", "open-location-code-prefix"],
+        elif code_length >= 4:
+            prefixes = ['l', pluscode[:4]+"0000+", pluscode[:2]+"000000+", "open-location-code-prefix"],
+        else:
+            prefixes = ['l', pluscode[:2]+"000000+", "open-location-code-prefix"],
 
         # see also https://github.com/Trustroots/nostroots/blob/main/docs/Events.md
         event = Event(kind=event_kind, content=event_content, tags=
@@ -110,7 +124,7 @@ class NostrPost:
                        ['L', "open-location-code"],
                        ['l', pluscode, "open-location-code"],
                        ['L', "open-location-code-prefix"],
-                       ['l', pluscode[:6]+"00+", pluscode[:4]+"0000+", pluscode[:2]+"000000+", "open-location-code-prefix"],
+                       prefixes,
                        ['L', "trustroots-circle"],
                        ['l', "hitchhikers", "trustroots-circle"],
                        ['g', geohash],
