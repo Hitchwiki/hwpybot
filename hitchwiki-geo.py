@@ -30,8 +30,13 @@ import settings
 def main():
     site = pywikibot.Site('en', 'hitchwiki')
     # print(site.title())
-    
-    cat = pywikibot.Category(site, 'Category:Spain')
+
+    # Log in
+    if not site.user():
+        site.login()  # This will prompt for a password if not already saved
+
+    print("Logged in as:", site.user())    
+    cat = pywikibot.Category(site, 'Category:Ireland')
     gen = pagegenerators.CategorizedPageGenerator(cat)
 
     nostr_post = NostrPost()
@@ -58,8 +63,13 @@ def main():
 
         elif "{{IsIn" in txt:
             print("The text contains {{IsIn}}")
+        elif "{{geo-missing}}" in txt:
+            print("The text already contains {{geo-missing}}")
         else:
-            print("no geo info in this article")
+            txt = page.text + "\n\n{{geo-missing}}\n"
+            page.text = txt
+            page.save("Added {{geo-missing}}")
+            print("no geo info in this article, adding {{geo-missing}} to ", page)
         time.sleep(2)
 
 
@@ -117,8 +127,8 @@ class NostrPost:
             print("posting to relays")
             self.relay_manager.publish_event(event)
             self.relay_manager.run_sync()  # Sync with the relay to send the event
-            print("posted nostr note, waiting a bit")
-            time.sleep(3)
+            # print("posted nostr note, waiting a bit")
+            # time.sleep(3)
 
     def close():
         self.relay_manager.close_all_relay_connections()
