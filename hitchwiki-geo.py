@@ -31,7 +31,7 @@ def main():
     site = pywikibot.Site('en', 'hitchwiki')
     # print(site.title())
     
-    cat = pywikibot.Category(site, 'Category:Belgium')
+    cat = pywikibot.Category(site, 'Category:Spain')
     gen = pagegenerators.CategorizedPageGenerator(cat)
 
     nostr_post = NostrPost()
@@ -100,11 +100,7 @@ class NostrPost:
                        ['L', "open-location-code"],
                        ['l', pluscode, "open-location-code"],
                        ['L', "open-location-code-prefix"],
-                       ['l', pluscode[:6]+"00+", "open-location-code-prefix"],
-                       ['L', "open-location-code-prefix"],
-                       ['l', pluscode[:4]+"0000+", "open-location-code-prefix"],
-                       ['L', "open-location-code-prefix"],
-                       ['l', pluscode[:2]+"000000+", "open-location-code-prefix"],
+                       ['l', pluscode[:6]+"00+", pluscode[:4]+"0000+", pluscode[:2]+"000000+", "open-location-code-prefix"],
                        ['L', "trustroots-circle"],
                        ['l', "hitchhikers", "trustroots-circle"],
                        ['g', geohash],
