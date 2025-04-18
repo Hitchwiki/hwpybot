@@ -16,3 +16,5 @@ Run the script:
 
     uv run hitchwiki-geo.py
 
+
+The nostr notes created by this script are visible on the hitchwiki map layer of the nostroots app, you can find APKs to try at https://github.com/trustroots/nostroots/issues/80
