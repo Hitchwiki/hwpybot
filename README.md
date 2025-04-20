@@ -13,6 +13,6 @@ See https://docs.astral.sh/uv/getting-started/installation/
 
 
 Run the script:
-
-    uv run hitchwiki-geo.py
-
+```
+uv run hitchwiki-geo.py
+```

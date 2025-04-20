@@ -1,0 +1,11 @@
+dotenv
+geohash2
+geopy
+ipykernel
+openai==1.75.0
+openlocationcode
+pynostr
+pywikibot
+tqdm
+wikipedia
+wikipedia-api

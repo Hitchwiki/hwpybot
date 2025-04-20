@@ -19,3 +19,5 @@ user-password.py
 settings.py
 
 pywikibot-*.lwp
+
+.env
