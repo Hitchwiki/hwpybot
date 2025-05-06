@@ -16,7 +16,7 @@ info_box = """{{infobox Location
 }}"""
 
 
-city_template = """'''{{FULLPAGENAMEE}}''' is a city in [[Country]]. 
+city_template = """'''{{FULLPAGENAMEE}}''' ((Turkish/German/French/Russian/...): Original city name) is a city in [[Country]]. 
 
 == Hitchhiking out ==
 === "cardinal direction" towards [[Other City]] ===
@@ -62,6 +62,7 @@ Explanations:
 A state is the largest administrative division in a country. E.g. Bundesland in Germany, Province in Canada, State in the USA or Regions in France.
 For mentions of larger cities or countries where one can expect there is already an article for them write them as [[entity]] which will create a link to them.
 For the categries and infobox field use the English names of entities.
+Use all headings from the given format, this is important to easily extend the template in the future. It is okay to leave some of them empty.
 
 Output:
 Only the translated formatted text. Do not add any other text or explanation.

@@ -7,5 +7,6 @@ openlocationcode
 pynostr
 pywikibot
 tqdm
+transliterate
 wikipedia
 wikipedia-api

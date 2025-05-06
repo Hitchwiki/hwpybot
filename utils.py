@@ -1,5 +1,7 @@
-from geopy.geocoders import Nominatim
 import requests
+
+from geopy.geocoders import Nominatim
+from transliterate import translit
 
 
 geolocator = Nominatim(user_agent="country_locator")
@@ -17,11 +19,11 @@ def get_country_coordinates(country_name):
         return None
 
 
-def get_english_city_name(german_name):
+def get_english_city_name(original_name:str, original_lang:str='de'):
     try:
         query = f"""
         SELECT ?cityLabel WHERE {{
-        ?city rdfs:label "{german_name}"@de.
+        ?city rdfs:label "{original_name}"@{original_lang}.
         SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
         }}
         LIMIT 1
@@ -35,7 +37,12 @@ def get_english_city_name(german_name):
         if results:
             return results[0]['cityLabel']['value']
         else:
-            return german_name  # fallback if not found
+            return original_name  # fallback if not found
     except Exception as e:
-        print(f"Error retrieving English city name for {german_name}: {e}")
-        return german_name
+        print(f"Error retrieving English city name for {original_name}: {e}")
+        return original_name
+    
+
+def cyrillic_to_latin(russian_name):
+    transliterated = translit(russian_name, 'ru', reversed=True)
+    return transliterated
