@@ -4,9 +4,12 @@ geopy
 ipykernel
 openai==1.75.0
 openlocationcode
+pandas
 pynostr
 pywikibot
+scipy
 tqdm
 transliterate
+wget
 wikipedia
 wikipedia-api

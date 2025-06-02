@@ -9,6 +9,8 @@ def heading_to_fragment(heading, num_same_heading_above:int):
     heading = re.sub(r"''+", "", heading)
     # 3. Normalize spaces to single underscores
     heading = re.sub(r"\s+", "_", heading)
+    # Remove [ and ] characters
+    heading = heading.replace("[", "").replace("]", "")
     # 4. Capitalize the first character
     if heading:
         heading = heading[0].upper() + heading[1:]
@@ -50,14 +52,16 @@ def extract_coords_and_headings(text):
     return results
 
 
-# Example usage:
-with open("page.txt", "r", encoding="utf-8") as f:
-    raw_wiki_page = f.read()
+def find_coords_and_headings(raw_wiki_page:str, title:str, base_url:str = "https://hitchwiki.org/en/") -> list[dict]:
+    results = []
+    for item in extract_coords_and_headings(raw_wiki_page):
+        if item["heading"]:
+            fragment = heading_to_fragment(item["heading"], item["same_heading_count"])
+            link = base_url + title + "#" + urllib.parse.quote(fragment)
+        else:
+            link = base_url + title
 
-base_url = "https://hitchwiki.org/en/Dresden#"
+        item["link"] = link
+        results.append(item)
 
-for item in extract_coords_and_headings(raw_wiki_page):
-    fragment = heading_to_fragment(item["heading"], item["same_heading_count"])
-    link = base_url + urllib.parse.quote(fragment)
-
-    print(f"Heading: {item['heading']}\nCoords: {item['coords']}\nLink: {link}\n")
+    return results

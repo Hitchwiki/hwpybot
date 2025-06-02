@@ -21,3 +21,5 @@ settings.py
 pywikibot-*.lwp
 
 .env
+*.sqlite
+*.csv
