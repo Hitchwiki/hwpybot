@@ -1,6 +1,6 @@
 german_info_box = """{{infobox German Location
 |country = Germany
-|map = <map lat='lat' lng='lng' zoom='9' view='0' />
+|map = <map lat='lat' lng='lng' zoom='9' />
 |pop = population
 |state = state
 |plate = license plate
@@ -9,7 +9,7 @@ german_info_box = """{{infobox German Location
 
 info_box = """{{infobox Location
 |country = country
-|map = <map lat='lat' lng='lng' zoom='9' view='0' />
+|map = <map lat='lat' lng='lng' zoom='9' />
 |pop = population
 |state = state
 |motorways = [[Ex]], [[Ay]]
