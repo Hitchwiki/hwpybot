@@ -24,3 +24,5 @@ pywikibot-*.lwp
 *.sqlite
 *.csv
 .ipynb
+
+.claude/
