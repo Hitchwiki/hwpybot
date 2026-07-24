@@ -7,9 +7,9 @@ lang_wiki = pywikibot.Site(code='en', fam='hitchwiki')
 if not lang_wiki.user():
     lang_wiki.login()
 
-pages = list(pagegenerators.AllpagesPageGenerator(site=lang_wiki))[5200:]
+pages = list(pagegenerators.AllpagesPageGenerator(site=lang_wiki))
 
-infobox_pattern = re.compile(r'\{\{Infobox\s+\w+\s+Location', re.IGNORECASE)
+infobox_pattern = re.compile(r'\{\{Infobox\s+(\w+\s+)?Location', re.IGNORECASE)
 
 for page in tqdm(pages, desc="Processing pages"):
     try:

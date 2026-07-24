@@ -1,5 +1,7 @@
 # Bot Automations for Hitchwiki
 
+[]
+
 This is [pywikibot](https://www.mediawiki.org/wiki/Manual:Pywikibot) code for [hitchwiki](https://hitchwiki.org/).
 
 ## Get started
