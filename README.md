@@ -1,6 +1,6 @@
 # Bot Automations for Hitchwiki
 
-[]
+[I think this is largely not needed for Hitchwiki admins, it is faster to just vibe in the hitchwiki.org repo on the server directly ~ @tillwenke]
 
 This is [pywikibot](https://www.mediawiki.org/wiki/Manual:Pywikibot) code for [hitchwiki](https://hitchwiki.org/).
 
